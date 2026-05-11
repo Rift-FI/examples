@@ -1,0 +1,763 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rift Vanilla Example</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+        color-scheme: light dark;
+        --bg: #0b0b10;
+        --surface: #15151c;
+        --border: #2a2a35;
+        --text: #f5f5f7;
+        --text-muted: #8a8a98;
+        --primary: #7c3aed;
+        --primary-hover: #6d28d9;
+        --success: #10b981;
+        --error: #ef4444;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background:
+          radial-gradient(circle at 20% 0%, rgba(124, 58, 237, 0.15), transparent 50%),
+          radial-gradient(circle at 80% 100%, rgba(124, 58, 237, 0.08), transparent 50%),
+          var(--bg);
+        color: var(--text);
+        -webkit-font-smoothing: antialiased;
+      }
+      .app { max-width: 720px; margin: 0 auto; padding: 48px 20px 80px; }
+      .brand { display: flex; align-items: center; gap: 12px; margin-bottom: 28px; flex-wrap: wrap; }
+      .brand-logo {
+        width: 40px; height: 40px; border-radius: 12px;
+        background: linear-gradient(135deg, var(--primary), #a78bfa);
+        display: grid; place-items: center; font-weight: 700; font-size: 18px; color: white;
+      }
+      .brand-name { font-size: 18px; font-weight: 600; letter-spacing: -0.01em; }
+      .brand-tag {
+        font-size: 12px; padding: 4px 10px; border-radius: 999px;
+        background: rgba(124, 58, 237, 0.12);
+        border: 1px solid rgba(124, 58, 237, 0.3);
+        color: #a78bfa;
+      }
+      h1 { font-size: 32px; font-weight: 600; letter-spacing: -0.02em; margin: 0 0 8px; }
+      .lede { color: var(--text-muted); margin: 0 0 32px; line-height: 1.6; }
+      .card {
+        background: var(--surface); border: 1px solid var(--border);
+        border-radius: 16px; padding: 24px; margin-bottom: 16px;
+      }
+      .card-title {
+        font-size: 14px; font-weight: 600;
+        text-transform: uppercase; letter-spacing: 0.05em;
+        color: var(--text-muted); margin: 0 0 16px;
+      }
+      .row {
+        display: flex; justify-content: space-between; align-items: center;
+        padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 14px;
+      }
+      .row:last-child { border-bottom: 0; }
+      .row-label { color: var(--text-muted); }
+      .row-value {
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 13px; max-width: 60%;
+        overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+      }
+      .btn {
+        display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+        padding: 12px 20px; border-radius: 12px; border: 0;
+        font-family: inherit; font-size: 14px; font-weight: 500; cursor: pointer;
+        transition: all 150ms ease;
+      }
+      .btn-primary { background: var(--primary); color: white; }
+      .btn-primary:hover { background: var(--primary-hover); }
+      .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+      .btn-secondary {
+        background: transparent; color: var(--text);
+        border: 1px solid var(--border);
+      }
+      .btn-secondary:hover { background: rgba(255, 255, 255, 0.04); }
+      .btn-block { width: 100%; }
+      form { display: grid; gap: 14px; }
+      label {
+        display: block; font-size: 12px; font-weight: 500;
+        color: var(--text-muted); margin-bottom: 6px;
+        text-transform: uppercase; letter-spacing: 0.05em;
+      }
+      input, select {
+        width: 100%; padding: 11px 12px;
+        background: var(--bg); border: 1px solid var(--border);
+        border-radius: 10px; color: var(--text);
+        font-family: inherit; font-size: 14px; outline: none;
+      }
+      input:focus, select:focus { border-color: var(--primary); }
+      .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+      .status { margin-top: 14px; padding: 12px; border-radius: 10px; font-size: 13px; }
+      .status-success {
+        background: rgba(16, 185, 129, 0.1);
+        border: 1px solid rgba(16, 185, 129, 0.3); color: var(--success);
+      }
+      .status-error {
+        background: rgba(239, 68, 68, 0.1);
+        border: 1px solid rgba(239, 68, 68, 0.3); color: var(--error);
+      }
+      .footer { margin-top: 36px; text-align: center; font-size: 12px; color: var(--text-muted); }
+      .footer a { color: #a78bfa; text-decoration: none; }
+      .hidden { display: none; }
+
+      .card-title-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 14px; }
+      .card-title-row .card-title { margin: 0; }
+      .btn-ghost {
+        background: transparent; color: var(--text-muted);
+        border: 1px solid var(--border);
+        padding: 6px 12px; font-size: 12px;
+        min-height: 32px; border-radius: 8px;
+      }
+      .btn-ghost:hover { color: var(--text); }
+
+      .balance-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border); }
+      .balance-row:last-child { border-bottom: 0; }
+      .balance-meta { display: flex; align-items: center; gap: 10px; min-width: 0; }
+      .token-badge {
+        font-weight: 600; font-size: 12px;
+        padding: 4px 8px; border-radius: 6px;
+        background: rgba(124, 58, 237, 0.12); color: #a78bfa;
+      }
+      .chain-label { font-size: 12px; color: var(--text-muted); }
+      .balance-amount {
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 14px; font-weight: 600; text-align: right;
+      }
+      .empty {
+        text-align: center; padding: 20px 10px;
+        font-size: 13px; color: var(--text-muted);
+      }
+      textarea {
+        width: 100%; padding: 11px 12px;
+        background: var(--bg); border: 1px solid var(--border);
+        border-radius: 10px; color: var(--text);
+        font-family: ui-monospace, monospace; font-size: 13px;
+        resize: vertical; min-height: 70px; outline: none;
+      }
+      textarea:focus { border-color: var(--primary); }
+
+      /* Mobile */
+      @media (max-width: 640px) {
+        .app { padding: 28px 14px 60px; }
+        .brand { margin-bottom: 20px; }
+        h1 { font-size: 24px; }
+        .lede { font-size: 14px; margin-bottom: 22px; }
+        .card { padding: 18px; border-radius: 14px; }
+        .grid-2 { grid-template-columns: 1fr; }
+        .row-value { max-width: 55%; font-size: 12px; }
+        .row { padding: 8px 0; }
+        .btn { min-height: 44px; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <div class="brand">
+        <div class="brand-logo">R</div>
+        <div class="brand-name">Rift Vanilla Example</div>
+        <div style="flex: 1"></div>
+        <span class="brand-tag">embed.js</span>
+      </div>
+
+      <h1>Wallet demo</h1>
+      <p class="lede">
+        Sign in with Google, email, or phone — Rift provisions a wallet on
+        first use. Then send a test transaction from the form below. Zero
+        build tools; this is one HTML file.
+      </p>
+
+      <!-- ── Step 1: Sign-in card (visible until signed in) ─────────── -->
+      <div class="card" id="signinCard" style="text-align: center">
+        <p class="card-title" style="margin: 0 0 20px">Step 1 — Sign in</p>
+        <button type="button" class="btn btn-primary" data-rift-trigger>
+          Sign in with Rift
+        </button>
+        <p style="margin-top: 14px; font-size: 13px; color: var(--text-muted)">
+          Google / Email / Phone — all in one modal.
+        </p>
+      </div>
+
+      <!-- ── Step 2: Wallet info (hidden until signed in) ───────────── -->
+      <div class="card hidden" id="walletCard">
+        <p class="card-title">Signed in</p>
+        <div class="row">
+          <span class="row-label">User ID</span>
+          <span class="row-value" id="userId">—</span>
+        </div>
+        <div class="row">
+          <span class="row-label">EVM address</span>
+          <span class="row-value" id="evmAddress">—</span>
+        </div>
+        <div class="row" id="btcRow">
+          <span class="row-label">BTC address</span>
+          <span class="row-value" id="btcAddress">—</span>
+        </div>
+        <div class="row">
+          <span class="row-label">Access token</span>
+          <span class="row-value" id="accessTokenPreview">—</span>
+        </div>
+        <button
+          type="button"
+          class="btn btn-secondary btn-block"
+          style="margin-top: 16px"
+          id="signOutBtn"
+        >
+          Sign out
+        </button>
+      </div>
+
+      <!-- ── Balances (hidden until signed in) ───────────────────────── -->
+      <div class="card hidden" id="balancesCard">
+        <div class="card-title-row">
+          <p class="card-title">Token balances</p>
+          <button type="button" class="btn-ghost" id="loadBalancesBtn">Load</button>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:10px">
+          <select id="balanceChain">
+            <option value="polygon">Polygon</option>
+            <option value="base">Base</option>
+            <option value="arbitrum">Arbitrum</option>
+            <option value="ethereum">Ethereum</option>
+            <option value="optimism">Optimism</option>
+            <option value="bnb">BNB Chain</option>
+          </select>
+        </div>
+
+        <div id="balancesList">
+          <div class="empty">Click <strong>Load</strong> to fetch live balances for this chain.</div>
+        </div>
+      </div>
+
+      <!-- ── Step 3: Send form (hidden until signed in) ─────────────── -->
+      <div class="card hidden" id="sendCard">
+        <p class="card-title">Step 2 — Send a transaction</p>
+
+        <!-- Sub-step A: collect tx details -->
+        <form id="sendForm">
+          <div>
+            <label for="to">Recipient address</label>
+            <input id="to" type="text" placeholder="0x..." required />
+          </div>
+          <div class="grid-2">
+            <div>
+              <label for="value">Amount</label>
+              <input id="value" type="text" inputmode="decimal" value="1" required />
+            </div>
+            <div>
+              <label for="token">Token</label>
+              <select id="token">
+                <option>USDC</option>
+                <option>USDT</option>
+                <option>ETH</option>
+                <option>MATIC</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <label for="chain">Chain</label>
+            <select id="chain">
+              <option value="polygon">Polygon</option>
+              <option value="base">Base</option>
+              <option value="arbitrum">Arbitrum</option>
+              <option value="ethereum">Ethereum</option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-primary btn-block" id="sendBtn">
+            Continue — confirm with OTP
+          </button>
+          <div id="sendStatus" class="hidden"></div>
+        </form>
+
+        <!-- Sub-step B: confirm with OTP (hidden until requested) -->
+        <form id="otpForm" class="hidden">
+          <div
+            id="otpSummary"
+            style="
+              padding: 14px;
+              background: rgba(124, 58, 237, 0.08);
+              border: 1px solid rgba(124, 58, 237, 0.25);
+              border-radius: 12px;
+              font-size: 13px;
+              line-height: 1.5;
+              margin-bottom: 14px;
+            "
+          ></div>
+          <div>
+            <label for="otpCode">Transaction OTP</label>
+            <input
+              id="otpCode"
+              type="text"
+              inputmode="text"
+              autocomplete="one-time-code"
+              maxlength="4"
+              placeholder="ABCD"
+              required
+              style="
+                text-align: center;
+                letter-spacing: 0.5em;
+                font-family: ui-monospace, monospace;
+                font-size: 20px;
+                font-weight: 600;
+              "
+            />
+          </div>
+          <button type="submit" class="btn btn-primary btn-block" id="confirmBtn">
+            Confirm and send
+          </button>
+          <button
+            type="button"
+            class="btn btn-secondary btn-block"
+            id="backToFormBtn"
+          >
+            ← Back
+          </button>
+          <div id="otpStatus" class="hidden"></div>
+        </form>
+      </div>
+
+      <!-- ── Sign a message (hidden until signed in) ─────────────────── -->
+      <div class="card hidden" id="signerCard">
+        <p class="card-title">Sign a message (arbitrary signing)</p>
+        <p style="font-size:13px;color:var(--text-muted);margin:0 0 14px;line-height:1.5">
+          Same model Rift uses for smart contract calls — your wallet signs whatever payload
+          Rift's backend constructs. Try a personal message here; swap the endpoint to
+          <code>/proxy-wallet/send-transaction</code> with raw calldata for an actual
+          contract call.
+        </p>
+        <form id="signerForm">
+          <div class="grid-2">
+            <div>
+              <label for="signerChain">Chain</label>
+              <select id="signerChain">
+                <option value="ETHEREUM">Ethereum</option>
+                <option value="POLYGON">Polygon</option>
+                <option value="BASE">Base</option>
+                <option value="ARBITRUM">Arbitrum</option>
+                <option value="OPTIMISM">Optimism</option>
+              </select>
+            </div>
+            <div style="align-self:end">
+              <button type="submit" class="btn btn-primary btn-block" id="signBtn">
+                Sign message
+              </button>
+            </div>
+          </div>
+          <div>
+            <label for="signerMessage">Message</label>
+            <textarea id="signerMessage" rows="3">Hello from Rift!</textarea>
+          </div>
+          <div id="signerStatus" class="hidden"></div>
+        </form>
+      </div>
+
+      <p class="footer">
+        Built with
+        <a href="https://widget.riftfi.xyz/embed.js" target="_blank">embed.js</a>
+        ·
+        <a href="https://service.riftfi.xyz/docs" target="_blank">Docs</a>
+      </p>
+    </div>
+
+    <!--
+      ── The Rift widget loader ──────────────────────────────────────
+      One <script> is the entire installation. Replace data-project-key
+      with your project's sk_… key from the Rift dashboard.
+
+      The loader installs `window.Rift.{open, close, on, off}` and binds
+      any element with `data-rift-trigger` to open the modal.
+    -->
+    <script
+      src="https://widget.riftfi.xyz/embed.js"
+      data-project-key="sk_c8d7717ff9abf62344be5e2f8f5200daab1cf0409f4aceb7239de25b088e369f"
+      async
+    ></script>
+
+    <script>
+      // Replace the constant with your project's sk_… key from the
+      // dashboard (same value as data-project-key on the embed script).
+      const API_KEY = "sk_c8d7717ff9abf62344be5e2f8f5200daab1cf0409f4aceb7239de25b088e369f";
+      // Hit the BACKEND directly. The wrapper at developers.riftfi.xyz
+      // also works (and has CORS after the latest deploy) but the
+      // backend is the canonical endpoint and is always permitted for
+      // origins in your project's "Domains" tab.
+      const BACKEND_URL = "https://service.riftfi.xyz";
+
+      // Decode a JWT payload without verifying — we only need the
+      // identity claims (email / phoneNumber) to know where to send
+      // the transaction-OTP. Server-side verification still happens
+      // on every authenticated call.
+      function decodeJwt(token) {
+        try {
+          const payload = token.split(".")[1];
+          if (!payload) return {};
+          const json = atob(payload.replace(/-/g, "+").replace(/_/g, "/"));
+          return JSON.parse(json);
+        } catch (e) {
+          return {};
+        }
+      }
+
+      // Hold the auth state in memory. embed.js doesn't expose a
+      // currentUser API yet, so we maintain our own copy from events.
+      let currentUser = null;
+      // Last-prepared transaction (set after submitting the form, used
+      // by the OTP step to actually call /transaction/spend).
+      let pendingTx = null;
+
+      // ── DOM refs ─────────────────────────────────────────────────
+      const signinCard      = document.getElementById("signinCard");
+      const walletCard      = document.getElementById("walletCard");
+      const balancesCard    = document.getElementById("balancesCard");
+      const sendCard        = document.getElementById("sendCard");
+      const signerCard      = document.getElementById("signerCard");
+      const userIdEl        = document.getElementById("userId");
+      const evmEl           = document.getElementById("evmAddress");
+      const btcRow          = document.getElementById("btcRow");
+      const btcEl           = document.getElementById("btcAddress");
+      const tokenEl         = document.getElementById("accessTokenPreview");
+      const signOutBtn      = document.getElementById("signOutBtn");
+      const sendForm        = document.getElementById("sendForm");
+      const sendBtn         = document.getElementById("sendBtn");
+      const sendStatus      = document.getElementById("sendStatus");
+      const otpForm         = document.getElementById("otpForm");
+      const otpInput        = document.getElementById("otpCode");
+      const otpSummary      = document.getElementById("otpSummary");
+      const confirmBtn      = document.getElementById("confirmBtn");
+      const otpStatus       = document.getElementById("otpStatus");
+      const backToFormBtn   = document.getElementById("backToFormBtn");
+      const loadBalancesBtn = document.getElementById("loadBalancesBtn");
+      const balanceChain    = document.getElementById("balanceChain");
+      const balancesList    = document.getElementById("balancesList");
+      const signerForm      = document.getElementById("signerForm");
+      const signerChain     = document.getElementById("signerChain");
+      const signerMessage   = document.getElementById("signerMessage");
+      const signBtn         = document.getElementById("signBtn");
+      const signerStatus    = document.getElementById("signerStatus");
+
+      function setSendStatus(kind, message) {
+        sendStatus.className = `status status-${kind}`;
+        sendStatus.textContent = message;
+      }
+      function setOtpStatus(kind, message) {
+        otpStatus.className = `status status-${kind}`;
+        otpStatus.textContent = message;
+      }
+
+      function showSignedIn(user) {
+        currentUser = user;
+        userIdEl.textContent = user.user;
+        evmEl.textContent = user.address;
+        if (user.btcAddress) {
+          btcEl.textContent = user.btcAddress;
+          btcRow.classList.remove("hidden");
+        } else {
+          btcRow.classList.add("hidden");
+        }
+        tokenEl.textContent = user.accessToken.slice(0, 24) + "…";
+        signinCard.classList.add("hidden");
+        walletCard.classList.remove("hidden");
+        balancesCard.classList.remove("hidden");
+        sendCard.classList.remove("hidden");
+        signerCard.classList.remove("hidden");
+      }
+
+      function showSignedOut() {
+        currentUser = null;
+        signinCard.classList.remove("hidden");
+        walletCard.classList.add("hidden");
+        balancesCard.classList.add("hidden");
+        sendCard.classList.add("hidden");
+        signerCard.classList.add("hidden");
+      }
+
+      function formatAmount(n) {
+        if (n === 0) return "0";
+        if (n < 0.0001) return n.toExponential(2);
+        if (n < 1) return n.toFixed(6).replace(/\.?0+$/, "");
+        if (n < 1000) return n.toFixed(4).replace(/\.?0+$/, "");
+        return n.toLocaleString(undefined, { maximumFractionDigits: 2 });
+      }
+
+      function setSignerStatus(kind, message) {
+        signerStatus.className = "status status-" + kind;
+        signerStatus.textContent = message;
+      }
+
+      // ── Wire up Rift events ──────────────────────────────────────
+      // window.Rift becomes available once embed.js has loaded.
+      // The async attribute means it might not be ready immediately,
+      // so we set up the listener inside a load handler.
+      window.addEventListener("load", () => {
+        if (!window.Rift) {
+          console.error("Rift embed failed to load. Check data-project-key.");
+          return;
+        }
+
+        Rift.on("signin-success", (user) => {
+          console.log("✓ signed in:", user);
+          showSignedIn(user);
+        });
+
+        Rift.on("signin-error", (e) => {
+          console.error("✗ sign-in error:", e.message);
+          alert("Sign-in failed: " + e.message);
+        });
+      });
+
+      // ── Sign out ────────────────────────────────────────────────
+      signOutBtn.addEventListener("click", () => {
+        // embed.js doesn't expose a logout call directly — for a true
+        // session-mode logout, hit your backend with the bearer token.
+        // For this example, clearing local state is enough.
+        showSignedOut();
+      });
+
+      // ── Step A: collect tx details → request OTP ────────────────
+      sendForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        if (!currentUser) return;
+        sendStatus.className = "hidden";
+
+        pendingTx = {
+          to: document.getElementById("to").value,
+          value: document.getElementById("value").value,
+          token: document.getElementById("token").value,
+          chain: document.getElementById("chain").value,
+        };
+
+        // Use the email/phone the user signed in with (from the JWT) to
+        // know where to send the confirmation code. The backend's
+        // verifyTransactionOtp middleware verifies the code against
+        // that same contact.
+        const identity = decodeJwt(currentUser.accessToken);
+        const otpTarget = identity.email
+          ? { email: identity.email }
+          : identity.phoneNumber
+            ? { phone: identity.phoneNumber }
+            : null;
+
+        if (!otpTarget) {
+          setSendStatus(
+            "error",
+            "Couldn't read email/phone from access token — needed to send confirmation OTP."
+          );
+          return;
+        }
+
+        sendBtn.disabled = true;
+        sendBtn.textContent = "Sending code…";
+
+        try {
+          const res = await fetch(`${BACKEND_URL}/otp/send`, {
+            method: "POST",
+            headers: {
+              "X-API-Key": API_KEY,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(otpTarget),
+          });
+          if (!res.ok) {
+            const data = await res.json().catch(() => ({}));
+            throw new Error(data.message || data.error || `HTTP ${res.status}`);
+          }
+
+          // Switch sub-step: hide tx form, show OTP form.
+          const target = otpTarget.email || otpTarget.phone;
+          otpSummary.innerHTML =
+            `Sending <strong>${pendingTx.value} ${pendingTx.token}</strong>` +
+            ` on <strong>${pendingTx.chain}</strong> to` +
+            ` <code style="font-size:12px">${pendingTx.to.slice(0, 6)}…${pendingTx.to.slice(-4)}</code>.` +
+            `<br />A confirmation code was sent to <strong>${target}</strong>.`;
+
+          // Numeric vs alphanumeric input based on contact channel.
+          if (otpTarget.email) {
+            otpInput.setAttribute("inputmode", "text");
+            otpInput.setAttribute("placeholder", "ABCD");
+          } else {
+            otpInput.setAttribute("inputmode", "numeric");
+            otpInput.setAttribute("placeholder", "0000");
+          }
+          otpInput.value = "";
+
+          sendForm.classList.add("hidden");
+          otpForm.classList.remove("hidden");
+          otpInput.focus();
+        } catch (err) {
+          setSendStatus("error", "✗ " + (err.message || "Couldn't send OTP"));
+        } finally {
+          sendBtn.disabled = false;
+          sendBtn.textContent = "Continue — confirm with OTP";
+        }
+      });
+
+      // Filter OTP input on every keystroke so users can only type
+      // characters the backend will accept.
+      otpInput.addEventListener("input", () => {
+        const isEmail = otpInput.getAttribute("inputmode") === "text";
+        otpInput.value = isEmail
+          ? otpInput.value.toUpperCase().replace(/[^A-Z0-9]/g, "")
+          : otpInput.value.replace(/[^0-9]/g, "");
+      });
+
+      backToFormBtn.addEventListener("click", () => {
+        otpStatus.className = "hidden";
+        otpForm.classList.add("hidden");
+        sendForm.classList.remove("hidden");
+      });
+
+      // ── Step B: submit OTP → /transaction/spend ─────────────────
+      otpForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        if (!currentUser || !pendingTx) return;
+        if (otpInput.value.length < 4) {
+          setOtpStatus("error", "Code must be 4 characters.");
+          return;
+        }
+        otpStatus.className = "hidden";
+        confirmBtn.disabled = true;
+        confirmBtn.textContent = "Signing & broadcasting…";
+
+        const body = {
+          ...pendingTx,
+          otpCode: otpInput.value,
+        };
+
+        try {
+          // Backend mounts at /transaction (singular). The spend action
+          // requires otpCode collected above (verifyTransactionOtp).
+          const res = await fetch(`${BACKEND_URL}/transaction/spend`, {
+            method: "POST",
+            headers: {
+              "X-API-Key": API_KEY,
+              "Authorization": `Bearer ${currentUser.accessToken}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(body),
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error || data.message || `HTTP ${res.status}`);
+
+          // Back to the tx form, show success message there.
+          otpForm.classList.add("hidden");
+          sendForm.classList.remove("hidden");
+          setSendStatus(
+            "success",
+            "✓ Sent. Tx hash: " + (data.hash || JSON.stringify(data))
+          );
+          pendingTx = null;
+        } catch (err) {
+          setOtpStatus("error", "✗ " + (err.message || "Send failed"));
+        } finally {
+          confirmBtn.disabled = false;
+          confirmBtn.textContent = "Confirm and send";
+        }
+      });
+
+      // ── Balances — GET /wallet/chain-balance?chain=… ─────────────
+      loadBalancesBtn.addEventListener("click", async () => {
+        if (!currentUser) return;
+        loadBalancesBtn.disabled = true;
+        loadBalancesBtn.textContent = "Loading…";
+        balancesList.innerHTML = "";
+
+        try {
+          const params = new URLSearchParams({ chain: balanceChain.value });
+          const res = await fetch(
+            `${BACKEND_URL}/wallet/chain-balance?${params}`,
+            {
+              headers: {
+                "X-API-Key": API_KEY,
+                "Authorization": "Bearer " + currentUser.accessToken,
+              },
+            }
+          );
+          const data = await res.json();
+          if (!res.ok) {
+            throw new Error(data.error || data.message || `HTTP ${res.status}`);
+          }
+          const rows = Array.isArray(data.data) ? data.data : [];
+          if (rows.length === 0) {
+            balancesList.innerHTML =
+              '<div class="empty">No balances on ' +
+              balanceChain.value +
+              '. (Send funds to your smart wallet to see them here.)</div>';
+          } else {
+            balancesList.innerHTML = rows
+              .map(
+                (b) =>
+                  '<div class="balance-row">' +
+                  '<div class="balance-meta">' +
+                  '<span class="token-badge">' + b.token + '</span>' +
+                  '<span class="chain-label">' + (b.chainName || b.chain) + '</span>' +
+                  '</div>' +
+                  '<div class="balance-amount">' + formatAmount(Number(b.amount)) + '</div>' +
+                  '</div>'
+              )
+              .join("");
+          }
+        } catch (err) {
+          balancesList.innerHTML =
+            '<div class="status status-error">✗ ' +
+            (err.message || "Couldn't load balances") +
+            "</div>";
+        } finally {
+          loadBalancesBtn.disabled = false;
+          loadBalancesBtn.textContent = "Refresh";
+        }
+      });
+
+      // ── Sign arbitrary message — POST /proxy-wallet/sign-message ──
+      // Same auth model lets you call /proxy-wallet/send-transaction
+      // with raw `data` (ABI-encoded calldata) for actual contract calls.
+      signerForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        if (!currentUser) return;
+        signerStatus.className = "hidden";
+        signBtn.disabled = true;
+        signBtn.textContent = "Signing…";
+
+        try {
+          const res = await fetch(`${BACKEND_URL}/proxy-wallet/sign-message`, {
+            method: "POST",
+            headers: {
+              "X-API-Key": API_KEY,
+              "Authorization": "Bearer " + currentUser.accessToken,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              chain: signerChain.value,
+              message: signerMessage.value,
+            }),
+          });
+          const data = await res.json();
+          if (!res.ok) {
+            throw new Error(data.error || data.message || `HTTP ${res.status}`);
+          }
+          const sig = data.signature || JSON.stringify(data);
+          signerStatus.className = "status status-success";
+          signerStatus.innerHTML =
+            "✓ Signed.<br /><code style=\"font-size:11px;word-break:break-all\">" +
+            sig +
+            "</code>";
+        } catch (err) {
+          setSignerStatus("error", "✗ " + (err.message || "Sign failed"));
+        } finally {
+          signBtn.disabled = false;
+          signBtn.textContent = "Sign message";
+        }
+      });
+    </script>
+  </body>
+</html>
