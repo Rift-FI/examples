@@ -1,17 +1,24 @@
 # Rift integration examples
 
-Two runnable examples showing how to drop Rift into a frontend:
+Two runnable examples showing how to drop Rift into a frontend. Both
+ship with a **public sandbox API key already wired in** — clone, run,
+and you're hitting a real Rift project on your first click.
 
 | Example | What it shows | Run with |
 |---|---|---|
-| [`react-app`](./react-app) | `@rift-finance/react` — provider, modal, hooks, send a transaction | `cd react-app && npm install && npm run dev` |
-| [`vanilla-html`](./vanilla-html) | `embed.js` on a static HTML page — same flow, no build step | open `index.html` (or `npx serve vanilla-html`) |
+| [`react-app`](./react-app) | `@rift-finance/react` — provider, modal, hooks, send a transaction | `cd react-app && cp .env.example .env.local && npm install && npm run dev` |
+| [`vanilla-html`](./vanilla-html) | `embed.js` on a static HTML page — same flow, no build step | `cd vanilla-html && npx serve .` |
 
 Both examples support **email OTP, phone OTP, Google, and Apple** out of the box — zero setup. Rift handles OAuth and code delivery under the hood; the widget UI surfaces every method automatically.
 
-## Prerequisites
+## Pointing at your own project later
 
-You need a Rift project API key (starts with `sk_`). Create one in the [dashboard](https://service.riftfi.xyz) under **Projects → Create project**. That's it.
+When you want to swap from the sandbox to your own Rift project:
+
+1. Create a project in the [dashboard](https://service.riftfi.xyz) — you'll get an `sk_…` API key.
+2. **React example**: open `react-app/.env.local` and replace the value of `VITE_RIFT_API_KEY`.
+3. **Vanilla example**: open `vanilla-html/index.html` and replace the key in two places (the `data-project-key` attribute on the embed `<script>` and the `API_KEY` constant in the inline JS).
+4. Make sure your local serving origin (e.g. `http://localhost:5190` for React, `http://localhost:3000` for vanilla) is in your project's **Domains** tab. The sandbox project has these origins allowlisted already.
 
 ## What each example does
 

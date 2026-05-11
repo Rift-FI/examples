@@ -10,26 +10,34 @@ No build step. No framework. Open `index.html` in a browser and you're done.
 
 ## Run it
 
-Replace `sk_YOUR_PROJECT_API_KEY` in **two** places near the bottom of [`index.html`](./index.html):
-
-- The `data-project-key` attribute on the `<script>` tag
-- The `API_KEY` constant in the inline JS (needed for the send-tx call)
-
-Then either:
+The file already has a public sandbox API key wired in, so you can run
+it as-is:
 
 ```bash
-# Option A: Just open the file
+# Option A: Serve it (recommended — some browsers limit fetch on file://)
+npx serve .            # http://localhost:3000
+```
+
+```bash
+# Option B: Just open the file
 open index.html        # macOS
 start index.html       # Windows
 xdg-open index.html    # Linux
 ```
 
-```bash
-# Option B: Serve it (recommended — some browsers limit fetch on file://)
-npx serve .            # http://localhost:3000
-```
+When you're ready to point this at your own Rift project, replace the
+key in **two** places near the bottom of [`index.html`](./index.html):
 
-> **Important:** for the widget to recognise the host page, your domain must be added to your project's **Domains** tab in the dashboard. Local dev: add `http://localhost:3000` (or whatever port `serve` picked).
+- The `data-project-key` attribute on the `<script>` tag
+- The `API_KEY` constant in the inline JS (used for `/otp/send` + `/transaction/spend`)
+
+Grab your own `sk_…` from the [Rift dashboard](https://service.riftfi.xyz).
+
+> **Note:** the sandbox project has `http://localhost:3000` in its
+> allowed Domains. If you swap to your own project key, add that origin
+> (or whatever port you serve on) to your project's **Domains** tab in
+> the dashboard — otherwise the backend CORS layer will reject the
+> widget's calls.
 
 ## What the integration looks like
 
@@ -59,13 +67,7 @@ That's all the merchant code. The widget owns the modal UI, the auth flow, and t
 
 ## Auth methods
 
-The widget surfaces what's available — you don't pick in code:
-
-- **Email + OTP**: always on. Rift sends the code from its own infrastructure.
-- **Phone + OTP**: always on. Same.
-- **Google**: only appears when *you* register your own Google OAuth Client ID and paste it into the project's **Auth** tab in the Rift dashboard. You do not use a Rift-owned Client ID — each project uses its own, which is how Rift's backend strictly scopes Google tokens per project (preventing cross-tenant replay).
-
-Apple Sign In follows the same pattern as Google.
+Google, Apple, email OTP, and phone OTP all appear in the modal automatically — zero setup. The widget UI surfaces every available method; merchant code doesn't pick.
 
 ## What's in this example
 

@@ -9,10 +9,18 @@ Minimal Vite + React app showing **`@rift-finance/react`** end-to-end:
 ## Run it
 
 ```bash
-cp .env.example .env.local        # then paste your sk_… key
+cp .env.example .env.local        # ships a working sandbox API key
 npm install
 npm run dev                       # http://localhost:5190
 ```
+
+`.env.example` already contains a public test API key, so the copy
+gives you a runnable app with zero edits. Open `.env.local` and swap
+in your own `sk_…` from the [Rift dashboard](https://service.riftfi.xyz)
+when you're ready to point at your own project.
+
+> Vite reads `.env.local` (gitignored), not `.env.example`. The copy
+> step is what wires Vite to your config.
 
 ## Where to look in the code
 
