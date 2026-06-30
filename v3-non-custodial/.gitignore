@@ -1,0 +1,12 @@
+node_modules
+dist
+.env
+.env.local
+.env.*.local
+*.log
+.DS_Store
+.vite
+*.tsbuildinfo
+# Accidental tsc output — repo is src/*.tsx only, build via `npm run build`.
+src/*.js
+src/*.js.map
